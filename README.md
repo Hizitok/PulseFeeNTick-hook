@@ -83,7 +83,8 @@ The dynamic fee is based on local trading activity around the current usable tic
 Let the center usable tick be `t`.
 Then the local weighted volume denominator is:
 
-`sum = (L_tick[t] * 2) + L_tick[t-1] + L_tick[t+1] + L_tick[t-2] + L_tick[t+2]`
+`sum = (L_tick[t] * 2) + L_tick[t-2] + L_tick[t-1] + L_tick[t+1] + L_tick[t+2]`
+(i.e., center tick has double weight, sum over ±2 usable tick range)
 
 The intended raw fee expression is:
 
@@ -98,7 +99,13 @@ Interpretation:
 - if recent volume is concentrated near current price, `sum` is large, so fee goes **down**
 - if recent volume is sparse around current price, `sum` is small, so fee goes **up**
 
-### 3.4 Fee refresh model
+### 3.4 Keeper volume update
+
+Keepers can periodically update the volume state via `updateVolume()`.
+Volume is tracked over a **wider ±7 tick range** to capture more trading activity.
+This wider range helps maintain volume data even when price moves around.
+
+### 3.5 Fee refresh model
 
 Dynamic fee is **pool-wide** and applies to the whole pool.
 It is not specific to vault LP only.
